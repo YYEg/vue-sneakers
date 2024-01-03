@@ -1,22 +1,36 @@
 <script setup>
 import Header from './components/Header.vue'
-import Card from './components/Card.vue'
+import CardList from './components/CardList.vue'
+import Drawer from './components/Drawer.vue'
 </script>
 
 <template>
+  <!-- <Drawer /> -->
   <div class="w-4/5 m-auto bg-white rounded-xl shadow-xl mt-14">
     <Header />
 
     <div class="p-10">
-      <h2 class="text-3xl font-bold mb-8">Все кроссовки</h2>
+      <div class="flex justify-between items-center">
+        <h2 class="text-3xl font-bold mb-8">Все кроссовки</h2>
 
-      <div class="grid grid-cols-4 gap-5">
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
+        <div class="flex gap-4">
+          <select class="py-2 px-3 border rounded-md outline-none">
+            <option>По названию</option>
+            <option>По цене(Сначала дорогие)</option>
+            <option>По цене(Сначала дешевые)</option>
+          </select>
+
+          <div class="relative">
+            <img class="absolute top-3 left-3" src="/search.svg" />
+            <input
+              class="border rounded-md pl-11 pr-4 py-2 outline-none focus:border-gray-400"
+              type="text"
+              placeholder="Поиск..."
+            />
+          </div>
+        </div>
       </div>
+      <CardList />
     </div>
   </div>
 </template>
