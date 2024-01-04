@@ -1,3 +1,7 @@
+<script setup>
+  const emit = defineEmits(['openDrawer'])
+</script>
+
 <template>
   <header class="flex justify-between items-center border-b border-slate-100 px-10 py-4">
     <div class="flex items-center gap-4">
