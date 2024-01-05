@@ -1,10 +1,11 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, inject } from 'vue'
 import axios from 'axios'
 
 import CardList from '../components/CardList.vue'
 
 const favorites = ref([])
+const { cart } = inject('cart')
 
 onMounted(async () => {
   try {
@@ -17,10 +18,18 @@ onMounted(async () => {
   } catch (err) {
     console.log(err)
   }
+
+  const localCart = localStorage.getItem('cart')
+
+  if (localCart) {
+    cart.value = JSON.parse(localCart)
+  } else {
+    cart.value = []
+  }
 })
 </script>
 
 <template>
   <h2 class="text-3xl font-bold mb-8">Мои избранные</h2>
-  <CardList :items="favorites" isFavorites class="v-auto-animate" />
+  <CardList :items="favorites" :isInFav="true" />
 </template>
