@@ -31,5 +31,5 @@ onMounted(async () => {
 
 <template>
   <h2 class="text-3xl font-bold mb-8">Мои избранные</h2>
-  <CardList :items="favorites" :isInFav="true" />
+  <CardList :items="favorites" :isFavorites="true" />
 </template>

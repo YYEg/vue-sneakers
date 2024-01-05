@@ -10,6 +10,8 @@ const props = defineProps({
   vatPrice: Number
 })
 
+const orderId = ref(null)
+
 const { cart } = inject('cart')
 
 const cartIsEmpty = computed(() => {
@@ -28,6 +30,8 @@ const createOrder = async () => {
     })
 
     cart.value = []
+
+    orderId.value = data.id
     return data
   } catch (err) {
     console.log(err)
@@ -42,11 +46,19 @@ const createOrder = async () => {
   <div class="bg-white w-96 h-full fixed right-0 top-0 z-20 p-8">
     <DrawerHead />
 
-    <div v-if="!totalPrice" class="flex h-full items-center justify-center">
+    <div v-if="!totalPrice || orderId" class="flex h-full items-center justify-center">
       <infoBlock
+        v-if="!totalPrice && !orderId"
         title="Корзина пуста"
         description="Добавьте хотя бы одну пару кроссовок, чтобы сделать заказ"
         image-url="/package-icon.png"
+      />
+
+      <infoBlock
+        v-if="orderId"
+        title="Ваш заказ оформлен!"
+        :description="`Ваш заказ No${orderId} скоро будет передан курьерской службе`"
+        image-url="/order-success-icon.png"
       />
     </div>
 
