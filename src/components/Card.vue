@@ -1,5 +1,4 @@
 <script setup>
-
 defineProps({
   id: Number,
   title: String,
@@ -24,7 +23,7 @@ defineProps({
         @click="onClickFavorite"
       />
       <img :src="imageUrl" alt="Sneakers" />
-      <p class="mt-2">{{ title }}</p>
+      <p class="mt-2 truncate line-clamp-1">{{ title }}</p>
       <div class="flex justify-between mt-5">
         <div class="flex flex-col">
           <span class="text-slate-500">Цена:</span>
