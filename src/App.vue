@@ -1,13 +1,13 @@
 <script setup>
-import { onMounted, reactive, ref, watch, provide, computed } from 'vue'
+import { ref, watch, provide, computed } from 'vue'
 import axios from 'axios'
 
 import Header from './components/Header.vue'
-import CardList from './components/CardList.vue'
+
 import Drawer from './components/Drawer.vue'
 
+/*Корзина*/
 const cart = ref([])
-const items = ref([])
 const isCreatingOrder = ref(false)
 
 const drawerOpen = ref(false)
@@ -19,11 +19,6 @@ const openDrawer = () => {
   drawerOpen.value = true
 }
 
-const filters = reactive({
-  sortBy: 'title',
-  searchQuery: ''
-})
-
 const addToCart = (item) => {
   cart.value.push(item)
   item.isAdded = true
@@ -33,14 +28,6 @@ const removeFromCart = (item) => {
   cart.value.splice(cart.value.indexOf(item), 1)
   console.log(cart.value)
   item.isAdded = false
-}
-
-const onClickAddPlus = (item) => {
-  if (!item.isAdded) {
-    addToCart(item)
-  } else {
-    removeFromCart(item)
-  }
 }
 
 const createOrder = async () => {
@@ -60,73 +47,6 @@ const createOrder = async () => {
   }
 }
 
-const onChangeSelect = (event) => {
-  filters.sortBy = event.target.value
-}
-
-const onChangeSearchInput = (event) => {
-  filters.searchQuery = event.target.value
-}
-
-const fetchFavorites = async () => {
-  try {
-    const { data: favorites } = await axios.get('https://c7191bbb87ac6c60.mokky.dev/favorites')
-    items.value = items.value.map((item) => {
-      const favorite = favorites.find((favorite) => favorite.parentId === item.id)
-
-      if (!favorite) {
-        return item
-      }
-
-      return { ...item, isFavorite: true, favoriteId: favorite.id }
-    })
-  } catch (err) {
-    console.log(err)
-  }
-}
-
-const addToFavorite = async (item) => {
-  try {
-    if (!item.isFavorite) {
-      const obj = {
-        parentId: item.id
-      }
-
-      item.isFavorite = true
-      const { data } = await axios.post('https://c7191bbb87ac6c60.mokky.dev/favorites', obj)
-      item.favoriteId = data.id
-    } else {
-      item.isFavorite = false
-      await axios.delete(`https://c7191bbb87ac6c60.mokky.dev/favorites/${item.favoriteId}`)
-      item.favoriteId = null
-    }
-  } catch (err) {
-    console.log(err)
-  }
-}
-
-const fetchItems = async () => {
-  try {
-    const params = {
-      sortBy: filters.sortBy
-    }
-
-    if (filters.searchQuery) {
-      params.title = `*${filters.searchQuery}*`
-    }
-
-    const { data } = await axios.get('https://c7191bbb87ac6c60.mokky.dev/items', { params })
-    items.value = data.map((obj) => ({
-      ...obj,
-      isFavorite: false,
-      favoriteId: null,
-      isAdded: false
-    }))
-  } catch (err) {
-    console.log(err)
-  }
-}
-
 const totalPrice = computed(() => {
   return cart.value.reduce((acc, item) => {
     return acc + item.price
@@ -139,25 +59,7 @@ const cartIsEmpty = computed(() => {
 
 const cartButtonDisabled = computed(() => isCreatingOrder.value || cartIsEmpty.value)
 
-onMounted(async () => {
-  const localCart = localStorage.getItem('cart')
 
-  if (localCart) {
-    cart.value = JSON.parse(localCart)
-  } else {
-    cart.value = []
-  }
-
-  await fetchItems()
-  await fetchFavorites()
-
-  items.value = items.value.map((item) => ({
-    ...item,
-    isAdded: cart.value.some((cartItem) => cartItem.id === item.id)
-  }))
-})
-
-watch(filters, fetchItems)
 
 watch(
   cart,
@@ -191,30 +93,7 @@ provide('cart', {
     <Header :totalPrice="totalPrice" @open-drawer="openDrawer" />
 
     <div class="p-10">
-      <div class="flex justify-between items-center">
-        <h2 class="text-3xl font-bold mb-8">Все кроссовки</h2>
-
-        <div class="flex gap-4">
-          <select @change="onChangeSelect" class="py-2 px-3 border rounded-md outline-none">
-            <option value="name">По названию</option>
-            <option value="-price">По цене(Сначала дорогие)</option>
-            <option value="price">По цене(Сначала дешевые)</option>
-          </select>
-
-          <div class="relative">
-            <img class="absolute top-3 left-3" src="/search.svg" />
-            <input
-              @input="onChangeSearchInput"
-              class="border rounded-md pl-11 pr-4 py-2 outline-none focus:border-gray-400"
-              type="text"
-              placeholder="Поиск..."
-            />
-          </div>
-        </div>
-      </div>
-      <div class="mt-10">
-        <CardList :items="items" @add-to-favorite="addToFavorite" @addToCart="onClickAddPlus" />
-      </div>
+      <router-view></router-view>
     </div>
   </div>
 </template>
